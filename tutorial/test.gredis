@@ -1,0 +1,24 @@
+// example.redis
+client := connect("localhost:6379")
+
+// 基本的 SET 命令
+set("key1", "value1")
+set("key2", "value2", 30)  // 30秒过期
+set("key3", "value3", true)  // NX 模式
+set("key4", "value4", true, 60)  // NX 模式 + 60秒过期
+
+// 使用参数结构体
+setArgs("key5", "value5", NX())
+setArgs("key6", "value6", EX(120))
+setArgs("key7", "value7", NXEX(180))
+
+// 获取值
+val := get("key1")
+println(val.Val())
+
+// 检查存在性
+exists := exists("key1", "key2")
+println(exists.Val())
+
+// 删除
+del("key1", "key2")
