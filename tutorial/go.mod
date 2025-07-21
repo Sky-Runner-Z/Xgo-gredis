@@ -1,6 +1,5 @@
 module tutorial
 
-go 1.23
+go 1.18
 
-
-replace github.com/go-wyvern/redis => ../../gredis
+replace github.com/Sky-Runner-Z/Xgo-gredis => ../../gredis

@@ -1,4 +1,4 @@
-module gredis
+module github.com/Sky-Runner-Z/Xgo-gredis
 
 go 1.16
 
