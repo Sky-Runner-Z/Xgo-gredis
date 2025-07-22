@@ -13,11 +13,64 @@ type index struct {
 	gredis.Client
 }
 //line index.redis:1
+// 测试基本字符串操作
 func (this *index) MainEntry() {
-//line index.redis:1:1
-	this.Set("user:1001", "john", 360000000)
+//line index.redis:2:1
+	this.Set("test:string", "hello world", 60000000000)
 //line index.redis:3:1
-	fmt.Println(this.Get("user:1001"))
+	value := this.Get("test:string")
+//line index.redis:4:1
+	fmt.Println("字符串值:", value)
+//line index.redis:7:1
+	this.Set("test:expire", "will expire", 5000000000)
+//line index.redis:8:1
+	this.Expire("test:expire", 10)
+//line index.redis:11:1
+	this.Set("test:del1", "value1", 0)
+//line index.redis:12:1
+	this.Set("test:del2", "value2", 0)
+//line index.redis:13:1
+	this.Del("test:del1", "test:del2")
+//line index.redis:16:1
+	this.HSet("user:1001", "name", "Alice")
+//line index.redis:17:1
+	this.HSet("user:1001", "age", "25")
+//line index.redis:18:1
+	this.HSet("user:1001", "email", "alice@example.com")
+//line index.redis:19:1
+	name := this.HGet("user:1001", "name")
+//line index.redis:20:1
+	age := this.HGet("user:1001", "age")
+//line index.redis:21:1
+	fmt.Println("用户名:", name, "年龄:", age)
+//line index.redis:24:1
+	this.LPush("tasks", "task1")
+//line index.redis:25:1
+	this.LPush("tasks", "task2")
+//line index.redis:26:1
+	this.LPush("tasks", "task3")
+//line index.redis:27:1
+	task := this.LPop("tasks")
+//line index.redis:28:1
+	fmt.Println("取出的任务:", task)
+//line index.redis:31:1
+	this.SAdd("tags", "redis", "database", "cache")
+//line index.redis:32:1
+	this.SAdd("tags", "nosql")
+//line index.redis:33:1
+	members := this.SMembers("tags")
+//line index.redis:34:1
+	fmt.Println("标签集合:", members)
+//line index.redis:37:1
+	ping_result := this.Ping()
+//line index.redis:38:1
+	fmt.Println("连接状态:", ping_result)
+//line index.redis:41:1
+	info_result := this.Info("server")
+//line index.redis:42:1
+	fmt.Println("服务器信息已获取", info_result)
+//line index.redis:46:1
+	fmt.Println("所有 Redis 功能测试完成!")
 }
 func (this *index) Main() {
 	gredis.Gopt_Client_Main(this)

@@ -1,3 +1,46 @@
-set("user:1001", "john", 360000000)
+// 测试基本字符串操作
+set("test:string", "hello world", 60000000000)
+value := get("test:string")
+println("字符串值:", value)
 
-println get("user:1001")
+// 测试过期时间
+set("test:expire", "will expire", 5000000000)
+expire("test:expire", 10000000000)
+
+// 测试删除操作
+set("test:del1", "value1", 0)
+set("test:del2", "value2", 0)
+del("test:del1", "test:del2")
+
+// 测试 Hash 操作
+hSet("user:1001", "name", "Alice")
+hSet("user:1001", "age", "25")
+hSet("user:1001", "email", "alice@example.com")
+name := hGet("user:1001", "name")
+age := hGet("user:1001", "age")
+println("用户名:", name, "年龄:", age)
+
+// 测试 List 操作
+lPush("tasks", "task1")
+lPush("tasks", "task2")
+lPush("tasks", "task3")
+task := lPop("tasks")
+println("取出的任务:", task)
+
+// 测试 Set 操作
+sAdd("tags", "redis", "database", "cache")
+sAdd("tags", "nosql")
+members := sMembers("tags")
+println("标签集合:", members)
+
+// 测试连接状态
+ping_result := ping()
+println("连接状态:", ping_result)
+
+// 测试服务器信息
+info_result := info("server")
+println("服务器信息已获取",info_result)
+
+
+
+println("所有 Redis 功能测试完成!")
