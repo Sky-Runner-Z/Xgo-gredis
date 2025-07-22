@@ -1,1 +1,3 @@
-set("user:1001", "john", 3600)
+set("user:1001", "john", 360000000)
+
+println get("user:1001")

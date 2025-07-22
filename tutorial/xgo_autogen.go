@@ -2,7 +2,10 @@
 
 package main
 
-import "github.com/Sky-Runner-Z/Xgo-gredis"
+import (
+	"fmt"
+	"github.com/Sky-Runner-Z/Xgo-gredis"
+)
 
 const _ = true
 
@@ -12,7 +15,9 @@ type index struct {
 //line index.redis:1
 func (this *index) MainEntry() {
 //line index.redis:1:1
-	this.Set("user:1001", "john", 3600)
+	this.Set("user:1001", "john", 360000000)
+//line index.redis:3:1
+	fmt.Println(this.Get("user:1001"))
 }
 func (this *index) Main() {
 	gredis.Gopt_Client_Main(this)

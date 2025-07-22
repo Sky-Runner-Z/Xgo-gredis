@@ -51,7 +51,7 @@ func (c *Client) initRedis() {
 		Host:     "14.103.115.251",
 		Port:     6379,
 		Password: "200228",
-		DB:       0,
+		DB:       1,
 		PoolSize: 10,
 	}
 	c.connections["default"] = NewConnection(defaultConfig)
@@ -309,7 +309,6 @@ func (c *Client) Info(section ...string) string {
 	if conn == nil {
 		return ""
 	}
-
 	result := conn.client.Info(c.ctx, section...)
 	info := result.Val()
 	c.results = append(c.results, "INFO命令已执行")
