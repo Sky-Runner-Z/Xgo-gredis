@@ -2,7 +2,7 @@ module tutorial
 
 go 1.24.5
 
-require github.com/Sky-Runner-Z/Xgo-gredis v0.0.0
+require github.com/Sky-Runner-Z/Xgo-gredis v0.0.0 // xgo:class
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect

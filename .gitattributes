@@ -1,0 +1,10 @@
+# 统一 Go 和 DSL 源代码使用 LF 换行符
+*.go text eol=lf
+*.xgo text eol=lf
+
+# 保持 Markdown 文档和 shell 脚本一致性
+*.md text eol=lf
+*.sh text eol=lf
+
+# 忽略 Windows 可执行文件作为文本处理
+*.exe binary

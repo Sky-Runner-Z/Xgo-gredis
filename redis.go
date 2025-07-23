@@ -50,7 +50,7 @@ func Set(key string, value interface{}, expiration time.Duration) *RedisCommand 
 		Operation: "SET",
 		Key:       key,
 		Value:     value,
-		TTL:       expiration*time.Second,
+		TTL:       expiration * time.Second,
 	}
 }
 
