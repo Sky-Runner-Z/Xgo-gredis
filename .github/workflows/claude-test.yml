@@ -10,6 +10,10 @@ on:
   pull_request_review:
     types: [submitted]
 
+env:
+  # 设置自定义的 Anthropic Base URL
+  ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+
 jobs:
   claude:
     if: |
@@ -37,14 +41,15 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           github_token: ${{ secrets.G_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
           # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
           # model: "claude-opus-4-1-20250805"
           model: "claude-3-5-sonnet-20241022"
         env:
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          # ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          # CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
 
       #1. 检查 Claude CLI 安装：
