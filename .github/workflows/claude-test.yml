@@ -46,4 +46,27 @@ jobs:
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
 
+      #1. 检查 Claude CLI 安装：
+      - name: Verify Claude CLI installation
+        run: |
+          which claude || echo "Claude CLI not found"
+          claude --version || echo "Claude CLI not working"
+    
+      #2. 检查 prompt 文件：
+      - name: Debug prompt file
+        run: |
+          ls -la ${{ runner.temp }}/claude-prompts/
+          cat ${{ runner.temp }}/claude-prompts/claude-prompt.txt
   
+      - name: Debug Claude Code Action
+        run: |
+          echo "Checking Claude CLI..."
+          which claude || echo "Claude CLI not found in PATH"
+          npm list -g @anthropic-ai/claude-code || echo "Package not found globally"
+    
+          echo "Checking prompt file..."
+          ls -la ${{ runner.temp }}/claude-prompts/ || echo "Prompt directory not found"
+    
+          echo "Environment check..."
+          echo "ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:+SET}"
+          echo "GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
