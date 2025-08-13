@@ -84,6 +84,7 @@
 
         #  1. 测试网络连接和端点
         - name: Test Custom Endpoint
+          if: always()
           run: |
             echo "=== Testing network connectivity ==="
             curl -I ${{ secrets.ANTHROPIC_BASE_URL }} || echo "Cannot reach endpoint"
@@ -98,6 +99,7 @@
 
         # 3. 测试直接 Claude CLI 调用
         - name: Test Claude CLI directly
+          if: always()
           run: |
             echo "Testing Claude CLI with actual prompt..."
             echo "Hello, can you hear me?" | claude -p || echo "Direct Claude test failed"
