@@ -48,17 +48,20 @@ jobs:
 
       #1. 检查 Claude CLI 安装：
       - name: Verify Claude CLI installation
+        if: always()  # 无论成功失败都执行
         run: |
           which claude || echo "Claude CLI not found"
           claude --version || echo "Claude CLI not working"
     
       #2. 检查 prompt 文件：
       - name: Debug prompt file
+        if: always()  # 无论成功失败都执行
         run: |
           ls -la ${{ runner.temp }}/claude-prompts/
           cat ${{ runner.temp }}/claude-prompts/claude-prompt.txt
   
       - name: Debug Claude Code Action
+        if: always()  # 无论成功失败都执行
         run: |
           echo "Checking Claude CLI..."
           which claude || echo "Claude CLI not found in PATH"
