@@ -43,6 +43,7 @@ jobs:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           
       - name: Debug Environment
+        shell: bash
         run: |
           echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
           echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
