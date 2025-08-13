@@ -34,21 +34,24 @@ jobs:
         run: |
           echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
           echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
+          echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
           echo "Base URL: $ANTHROPIC_BASE_URL"
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           
       - name: Run Claude Code
         id: claude
         # uses: Sky-Runner-Z/claude-code-action@test
         uses: anthropics/claude-code-action@beta
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.G_TOKEN }}
           allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
           custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
           model: "claude-opus-4-1-20250805"
         env:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
