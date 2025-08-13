@@ -1,81 +1,141 @@
-name: Claude Code
+  name: Claude Code
 
-on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  issues:
-    types: [opened, assigned]
-  pull_request_review:
-    types: [submitted]
+  on:
+    issue_comment:
+      types: [created]
+    pull_request_review_comment:
+      types: [created]
+    issues:
+      types: [opened, assigned]
+    pull_request_review:
+      types: [submitted]
 
-env:
-  # 设置自定义的 Anthropic Base URL
-  ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+  env:
+    # 设置自定义的 Anthropic Base URL
+    ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
 
-jobs:
-  claude:
-    if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-      issues: read
-      id-token: write
+  jobs:
+    claude:
+      if: |
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write        # 改为 write
+        pull-requests: write   # 改为 write  
+        issues: write         # 改为 write
+        id-token: write
 
-    steps:      
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+
+        - name: Run Claude Code
+          id: claude
+          uses: anthropics/claude-code-action@v0.0.49
+          with:
+            # 只使用一种认证方式
+            claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+            github_token: ${{ secrets.G_TOKEN }}
+            model: "claude-3-5-sonnet-20241022"
+          env:
+            # 确保 ANTHROPIC_BASE_URL 传递到 action
+            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+
+        # 调试步骤（可选）
+        - name: Debug Claude Code Action
+          if: always()
+          run: |
+            echo "Environment check..."
+            echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
+            echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
+            which claude || echo "Claude CLI not found"
+            claude --version || echo "Claude CLI not working"
+
+
+
+# name: Claude Code
+
+# on:
+#   issue_comment:
+#     types: [created]
+#   pull_request_review_comment:
+#     types: [created]
+#   issues:
+#     types: [opened, assigned]
+#   pull_request_review:
+#     types: [submitted]
+
+# env:
+#   # 设置自定义的 Anthropic Base URL
+#   ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+
+# jobs:
+#   claude:
+#     if: |
+#       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+#       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+#       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+#       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       pull-requests: read
+#       issues: read
+#       id-token: write
+
+#     steps:      
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
           
-      - name: Run Claude Code
-        id: claude
-        # uses: Sky-Runner-Z/claude-code-action@test
-        uses: anthropics/claude-code-action@v0.0.49
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          github_token: ${{ secrets.G_TOKEN }}
-          claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
-          # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
-          # model: "claude-opus-4-1-20250805"
-          model: "claude-3-5-sonnet-20241022"
-        env:
-          # ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          # CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+#       - name: Run Claude Code
+#         id: claude
+#         # uses: Sky-Runner-Z/claude-code-action@test
+#         uses: anthropics/claude-code-action@v0.0.49
+#         with:
+#           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+#           github_token: ${{ secrets.G_TOKEN }}
+#           claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+#           # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+#           # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
+#           # model: "claude-opus-4-1-20250805"
+#           model: "claude-3-5-sonnet-20241022"
+#         env:
+#           # ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+#           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+#           # CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
 
-      #1. 检查 Claude CLI 安装：
-      - name: Verify Claude CLI installation
-        if: always()  # 无论成功失败都执行
-        run: |
-          which claude || echo "Claude CLI not found"
-          claude --version || echo "Claude CLI not working"
+#       #1. 检查 Claude CLI 安装：
+#       - name: Verify Claude CLI installation
+#         if: always()  # 无论成功失败都执行
+#         run: |
+#           which claude || echo "Claude CLI not found"
+#           claude --version || echo "Claude CLI not working"
     
-      #2. 检查 prompt 文件：
-      - name: Debug prompt file
-        if: always()  # 无论成功失败都执行
-        run: |
-          ls -la ${{ runner.temp }}/claude-prompts/
-          cat ${{ runner.temp }}/claude-prompts/claude-prompt.txt
+#       #2. 检查 prompt 文件：
+#       - name: Debug prompt file
+#         if: always()  # 无论成功失败都执行
+#         run: |
+#           ls -la ${{ runner.temp }}/claude-prompts/
+#           cat ${{ runner.temp }}/claude-prompts/claude-prompt.txt
   
-      - name: Debug Claude Code Action
-        if: always()  # 无论成功失败都执行
-        run: |
-          echo "Checking Claude CLI..."
-          which claude || echo "Claude CLI not found in PATH"
-          npm list -g @anthropic-ai/claude-code || echo "Package not found globally"
+#       - name: Debug Claude Code Action
+#         if: always()  # 无论成功失败都执行
+#         run: |
+#           echo "Checking Claude CLI..."
+#           which claude || echo "Claude CLI not found in PATH"
+#           npm list -g @anthropic-ai/claude-code || echo "Package not found globally"
     
-          echo "Checking prompt file..."
-          ls -la ${{ runner.temp }}/claude-prompts/ || echo "Prompt directory not found"
+#           echo "Checking prompt file..."
+#           ls -la ${{ runner.temp }}/claude-prompts/ || echo "Prompt directory not found"
     
-          echo "Environment check..."
-          echo "ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:+SET}"
-          echo "GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
+#           echo "Environment check..."
+#           echo "ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:+SET}"
+#           echo "GITHUB_TOKEN: ${GITHUB_TOKEN:+SET}"
