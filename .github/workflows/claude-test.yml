@@ -107,6 +107,19 @@
             ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
+        # 测试不同的认证格式：
+        - name: Test Different Auth Formats
+          run: |
+            echo "=== Testing Bearer token ==="
+            curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+                 -H "Content-Type: application/json" \
+                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Bearer failed"
+      
+            echo "=== Testing API key format ==="
+            curl -H "x-api-key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+                 -H "Content-Type: application/json" \
+                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "API key failed"
+
 
       
 # name: Claude Code
