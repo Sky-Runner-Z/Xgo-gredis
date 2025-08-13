@@ -82,7 +82,31 @@
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
             CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
+        #  1. 测试网络连接和端点
+        - name: Test Custom Endpoint
+          run: |
+            echo "=== Testing network connectivity ==="
+            curl -I ${{ secrets.ANTHROPIC_BASE_URL }} || echo "Cannot reach endpoint"
+      
+            echo "=== Testing authentication ==="
+            curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+                 -H "Content-Type: application/json" \
+                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Auth test failed"
+          env:
+            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
+        # 3. 测试直接 Claude CLI 调用
+        - name: Test Claude CLI directly
+          run: |
+            echo "Testing Claude CLI with actual prompt..."
+            echo "Hello, can you hear me?" | claude -p || echo "Direct Claude test failed"
+          env:
+            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+
+
+      
 # name: Claude Code
 
 # on:
