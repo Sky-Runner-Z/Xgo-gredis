@@ -89,7 +89,7 @@ jobs:
       # 暂时使用最简配置来测试：
     
       - name: Run Claude Code (Minimal)
-        uses: Sky-Runner-Z/claude-code-action@test
+        uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           timeout_minutes: "5"
