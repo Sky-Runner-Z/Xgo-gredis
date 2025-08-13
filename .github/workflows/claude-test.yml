@@ -92,6 +92,7 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          github_token: ${{ secrets.G_TOKEN }}
           timeout_minutes: "5"
           # 移除所有自定义配置，使用默认设置
         env:
