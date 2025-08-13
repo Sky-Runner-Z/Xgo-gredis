@@ -44,6 +44,7 @@ jobs:
         env:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
 
       #1. 检查 Claude CLI 安装：
