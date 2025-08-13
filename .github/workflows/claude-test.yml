@@ -67,7 +67,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
             -d '{
-              "model": "claude-3-haiku-20240307",
+              "model": "claude-opus-4-1-20250805",
               "max_tokens": 10,
               "messages": [{"role": "user", "content": "test"}]
             }' -o /tmp/api_response.json)
