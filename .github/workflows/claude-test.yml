@@ -24,157 +24,38 @@ jobs:
       issues: read
       id-token: write
 
-    steps:
+    steps:      
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 重要：获取完整历史
-          token: ${{ secrets.G_TOKEN }}
-
-      - name: Setup Git
+          fetch-depth: 0
+          
+      - name: Debug Environment
+        shell: bash
         run: |
-          git config --global user.name "Claude Code"
-          git config --global user.email "claude-code@anthropic.com"
-          echo "Git setup completed"
-
-      - name: Verify Git Repository
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -la
-          git status
-          git remote -v
-
-      - name: Test API Connection
-        run: |
-          # 使用你之前测试成功的模型名称
-          response=$(curl -s -w "%{http_code}" -X POST "$ANTHROPIC_BASE_URL/v1/messages" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
-            -d '{
-              "model": "claude-opus-4-1-20250805",
-              "max_tokens": 10,
-              "messages": [{"role": "user", "content": "test"}]
-            }' -o /tmp/api_response.json)
-
-          if [[ "$response" != "200" ]]; then
-            echo "API test failed with status $response"
-            cat /tmp/api_response.json
-            exit 1
-          fi
-          echo "API connection successful"
+          echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
+          echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
+          echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
+          echo "Base URL: $ANTHROPIC_BASE_URL"
         env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-
+          
       - name: Run Claude Code
-        uses: anthropics/claude-code-action@v0.0.56
+        id: claude
+        # uses: Sky-Runner-Z/claude-code-action@test
+        uses: anthropics/claude-code-action@v0.0.1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           github_token: ${{ secrets.G_TOKEN }}
-          model: "claude-opus-4-1-20250805"  # 使用测试成功的模型名称
-          timeout_minutes: "15"
+          # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+          # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
+          # model: "claude-opus-4-1-20250805"
+          model: "claude-3-5-sonnet-20241022"
         env:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-          DEBUG: "1"  # 启用调试模式
-          CLAUDE_CODE_DEBUG: "1"
-          NODE_ENV: "development"
-
-
-          # 2. 检查执行文件和输出
-    
-      - name: Debug Claude Execution
-        if: always()  # 无论成功失败都执行
-        run: |
-          echo "=== Claude Code Execution Debug ==="
-          echo "Exit code: ${{ steps.claude.outcome }}"
-    
-          echo "=== Checking output files ==="
-          find /home/runner -name "*claude*" -type f 2>/dev/null | head -20
-          find /tmp -name "*claude*" -type f 2>/dev/null | head -20
-    
-          echo "=== Checking execution logs ==="
-          ls -la /home/runner/.claude/ || echo "Claude directory not found"
-          ls -la /home/runner/.claude/logs/ || echo "Logs directory not found"
-    
-          echo "=== Recent log files ==="
-          find /home/runner/.claude -name "*.log" -exec echo "=== {} ===" \; -exec tail -50 {} \; 2>/dev/null || echo "No log files found"
-    
-          echo "=== Checking for execution results ==="
-          if [ -n "${{ steps.claude.outputs.execution_file }}" ]; then
-            echo "Execution file: ${{ steps.claude.outputs.execution_file }}"
-            cat "${{ steps.claude.outputs.execution_file }}" || echo "Cannot read execution file"
-          fi
-    
-          echo "=== System resources after execution ==="
-          free -h
-          df -h
-    
-      # 3. 检查 slash commands 问题
-    
-      - name: Debug Slash Commands Issue
-        run: |
-          echo "=== Slash Commands Debug ==="
-          echo "Action path: ${GITHUB_ACTION_PATH}"
-          ls -la ${GITHUB_ACTION_PATH}/ || echo "Action path not found"
-          ls -la ${GITHUB_ACTION_PATH}/slash-commands/ || echo "Slash commands directory not found"
-    
-          echo "=== Claude directory ==="
-          ls -la /home/runner/.claude/ || echo "Claude directory not accessible"
-    
-          echo "=== Manual copy test ==="
-          if [ -d "${GITHUB_ACTION_PATH}/slash-commands" ]; then
-            cp -r ${GITHUB_ACTION_PATH}/slash-commands /home/runner/.claude/ || echo "Manual copy failed: $?"
-          else
-            echo "Source slash-commands directory does not exist"
-          fi
-        env:
-          GITHUB_ACTION_PATH: /home/runner/work/_actions/anthropics/claude-code-action/beta
-
-      - name: Post-execution Debug
-        if: always()
-        run: |
-              echo "=== Claude execution result ==="
-              echo "Outcome: ${{ steps.claude.outcome }}"
-              echo "Conclusion: ${{ steps.claude.conclusion }}"
-  
-              echo "=== Process information ==="
-              ps aux | grep -i claude || echo "No claude processes"
-  
-              echo "=== Log files ==="
-              find /home/runner -name "*.log" -newer /tmp -exec echo "=== {} ===" \; -exec cat {} \; 2>/dev/null || echo "No recent log files"
-
-      
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 1
-          
-      # - name: Debug Environment
-      #   shell: bash
-      #   run: |
-      #     echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
-      #     echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
-      #     echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
-      #     echo "Base URL: $ANTHROPIC_BASE_URL"
-      #   env:
-      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-      #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          
-      # - name: Run Claude Code
-      #   id: claude
-      #   # uses: Sky-Runner-Z/claude-code-action@test
-      #   uses: anthropics/claude-code-action@beta
-      #   with:
-      #     anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-      #     github_token: ${{ secrets.G_TOKEN }}
-      #     # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
-      #     # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
-      #     # model: "claude-opus-4-1-20250805"
-      #     model: "claude-3-5-sonnet-20241022"
-      #   env:
-      #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-      #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
 
   
