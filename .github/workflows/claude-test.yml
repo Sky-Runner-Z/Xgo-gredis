@@ -24,35 +24,123 @@ jobs:
       issues: read
       id-token: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          
-      - name: Debug Environment
-        shell: bash
+      - name: Debug Before Claude Execution
         run: |
-          echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
+          echo "=== Environment Check ==="
           echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
           echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
           echo "Base URL: $ANTHROPIC_BASE_URL"
+          echo "=== File Check ==="
+          ls -la /home/runner/work/_temp/claude-prompts/ || echo "Prompt directory not found"
+          cat /home/runner/work/_temp/claude-prompts/claude-prompt.txt || echo "Prompt file not found"
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          
+    
       - name: Run Claude Code
-        id: claude
-        # uses: Sky-Runner-Z/claude-code-action@test
-        uses: anthropics/claude-code-action@beta
+        continue-on-error: true  # 添加这行，即使失败也继续执行
+        uses: Sky-Runner-Z/claude-code-action@test
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          github_token: ${{ secrets.G_TOKEN }}
-          # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
-          # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
-          # model: "claude-opus-4-1-20250805"
-          model: "claude-3-5-sonnet-20241022"
+          timeout_minutes: "10"  # 添加超时限制
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+    
+      - name: Debug After Claude Execution
+        if: always()  # 无论上一步是否成功都执行
+        run: |
+          echo "=== Claude Execution Results ==="
+          echo "Exit code: $?"
+          echo "=== Checking for output files ==="
+          find /home/runner -name "*claude*" -type f 2>/dev/null || echo "No claude files found"
+          echo "=== Checking logs ==="
+          ls -la ${{ github.workspace }}/.github/ || echo "No github directory"
+    
+      # 2. 测试 API 连接
+    
+      # 在 Claude Code 执行前添加 API 连接测试：
+    
+      - name: Test API Connection
+        run: |
+          echo "Testing API connection..."
+          response=$(curl -s -w "%{http_code}" -X POST "$ANTHROPIC_BASE_URL/v1/messages" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
+            -d '{
+              "model": "claude-3-haiku-20240307",
+              "max_tokens": 10,
+              "messages": [{"role": "user", "content": "test"}]
+            }' -o /tmp/api_response.json)
+    
+          echo "HTTP Status: $response"
+          echo "Response:"
+          cat /tmp/api_response.json
+    
+          if [[ "$response" != "200" ]]; then
+            echo "API test failed with status $response"
+            exit 1
+          fi
         env:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+    
+      # 3. 简化配置
+    
+      # 暂时使用最简配置来测试：
+    
+      - name: Run Claude Code (Minimal)
+        uses: Sky-Runner-Z/claude-code-action@test
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          timeout_minutes: "5"
+          # 移除所有自定义配置，使用默认设置
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+    
+    
+      # 5. 查看系统日志
+    
+      - name: Check System Resources
+        run: |
+          echo "=== Memory Usage ==="
+          free -h
+          echo "=== Disk Usage ==="
+          df -h
+          echo "=== Process List ==="
+          ps aux | head -20
 
+        
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 1
+          
+      # - name: Debug Environment
+      #   shell: bash
+      #   run: |
+      #     echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
+      #     echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
+      #     echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
+      #     echo "Base URL: $ANTHROPIC_BASE_URL"
+      #   env:
+      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          
+      # - name: Run Claude Code
+      #   id: claude
+      #   # uses: Sky-Runner-Z/claude-code-action@test
+      #   uses: anthropics/claude-code-action@beta
+      #   with:
+      #     anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+      #     github_token: ${{ secrets.G_TOKEN }}
+      #     # allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+      #     # custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
+      #     # model: "claude-opus-4-1-20250805"
+      #     model: "claude-3-5-sonnet-20241022"
+      #   env:
+      #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+
+
+  
