@@ -58,6 +58,30 @@
             claude --version || echo "Claude CLI not working"
 
 
+        - name: Debug Claude Environment Before Execution
+          if: always()
+          run: |
+            echo "=== Claude CLI Debug ==="
+            which claude
+            claude --version
+      
+            echo "=== Environment Variables ==="
+            echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
+            echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
+            echo "CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:+SET}"
+      
+            echo "=== Test Claude CLI directly ==="
+            # 测试 Claude CLI 是否能正常启动
+            echo "test prompt" | claude --help || echo "Claude help failed"
+      
+            echo "=== Prompt file check ==="
+            ls -la ${{ runner.temp }}/claude-prompts/
+            head -10 ${{ runner.temp }}/claude-prompts/claude-prompt.txt
+          env:
+            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+            CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+
 
 # name: Claude Code
 
