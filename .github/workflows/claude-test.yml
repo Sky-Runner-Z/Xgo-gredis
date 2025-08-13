@@ -28,7 +28,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
+          
+      - name: Debug Environment
+        shell: bash
+        run: |
+          echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
+          echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
+          echo "Base URL: $ANTHROPIC_BASE_URL"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          
       - name: Run Claude Code
         id: claude
         # uses: Sky-Runner-Z/claude-code-action@test
@@ -41,13 +51,4 @@ jobs:
           model: "claude-opus-4-1-20250805"
         env:
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-          
-      - name: Debug Environment
-        shell: bash
-        run: |
-          echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
-          echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
-          echo "Base URL: $ANTHROPIC_BASE_URL"
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+
