@@ -30,22 +30,10 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Debug Environment
-        shell: bash
-        run: |
-          echo "ANTHROPIC_API_KEY is set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo "yes" || echo "no")"
-          echo "ANTHROPIC_BASE_URL is set: $([[ -n "$ANTHROPIC_BASE_URL" ]] && echo "yes" || echo "no")"
-          echo "ANTHROPIC_AUTH_TOKEN is set: $([[ -n "$ANTHROPIC_AUTH_TOKEN" ]] && echo "yes" || echo "no")"
-          echo "Base URL: $ANTHROPIC_BASE_URL"
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          
       - name: Run Claude Code
         id: claude
         # uses: Sky-Runner-Z/claude-code-action@test
-        uses: anthropics/claude-code-action@v0.0.1
+        uses: anthropics/claude-code-action@v0.0.49
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           github_token: ${{ secrets.G_TOKEN }}
