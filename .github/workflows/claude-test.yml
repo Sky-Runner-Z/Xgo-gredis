@@ -104,6 +104,8 @@
         - name: Test Claude CLI directly
           if: always()
           run: |
+            export ANTHROPIC_BASE_URL="https://cc.qiniu.com/api/"
+            export ANTHROPIC_AUTH_TOKEN=${{ secrets.ANTHROPIC_AUTH_TOKEN }}
             echo "Testing Claude CLI with actual prompt..."
             echo "Hello, can you hear me?" | claude -p || echo "Direct Claude test failed"
           env:
