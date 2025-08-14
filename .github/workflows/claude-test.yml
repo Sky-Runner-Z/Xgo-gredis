@@ -37,15 +37,18 @@
 
         - name: Run Claude Code
           id: claude
-          uses: anthropics/claude-code-action@v0.0.49
+          uses: Sky-Runner-Z/claude-code-action@v0.0.1
           with:
             # 只使用一种认证方式
             claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
             github_token: ${{ secrets.G_TOKEN }}
             model: "claude-3-5-sonnet-20241022"
           env:
             # 确保 ANTHROPIC_BASE_URL 传递到 action
             ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
 
         # 调试步骤（可选）
         - name: Debug Claude Code Action
