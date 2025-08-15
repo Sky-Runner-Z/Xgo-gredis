@@ -42,7 +42,7 @@
             model: "claude-sonnet-4-20250514"
           env:
             # 确保 ANTHROPIC_BASE_URL 传递到 action
-            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_BASE_URL: "https://cc.qiniu.com/api/"
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
 
         # # 调试步骤（可选）
