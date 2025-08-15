@@ -44,7 +44,7 @@
             ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
             github_token: ${{ secrets.G_TOKEN }}
-            model: "claude-3-5-sonnet-20241022"
+            model: "claude-sonnet-4-20250514"
           env:
             # 确保 ANTHROPIC_BASE_URL 传递到 action
             ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
