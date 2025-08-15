@@ -10,11 +10,6 @@
     pull_request_review:
       types: [submitted]
 
-  env:
-    # 设置自定义的 Anthropic Base URL
-    ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-    ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
-
   jobs:
     claude:
       if: |
@@ -41,7 +36,7 @@
           with:
             # 只使用一种认证方式
             claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+            ANTHROPIC_BASE_URL: "https://cc.qiniu.com/api/"
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
             github_token: ${{ secrets.G_TOKEN }}
             model: "claude-sonnet-4-20250514"
