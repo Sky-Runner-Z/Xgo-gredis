@@ -50,81 +50,81 @@
             ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
             ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}  # 添加到全局 env
 
-        # 调试步骤（可选）
-        - name: Debug Claude Code Action
-          if: always()
-          run: |
-            echo "Environment check..."
-            echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
-            echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
-            which claude || echo "Claude CLI not found"
-            claude --version || echo "Claude CLI not working"
+        # # 调试步骤（可选）
+        # - name: Debug Claude Code Action
+        #   if: always()
+        #   run: |
+        #     echo "Environment check..."
+        #     echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
+        #     echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
+        #     which claude || echo "Claude CLI not found"
+        #     claude --version || echo "Claude CLI not working"
 
 
-        - name: Debug Claude Environment Before Execution
-          if: always()
-          run: |
-            echo "=== Claude CLI Debug ==="
-            which claude
-            claude --version
+        # - name: Debug Claude Environment Before Execution
+        #   if: always()
+        #   run: |
+        #     echo "=== Claude CLI Debug ==="
+        #     which claude
+        #     claude --version
       
-            echo "=== Environment Variables ==="
-            echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
-            echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
-            echo "CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:+SET}"
+        #     echo "=== Environment Variables ==="
+        #     echo "ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:+SET}"
+        #     echo "ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:+SET}"
+        #     echo "CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:+SET}"
       
-            echo "=== Test Claude CLI directly ==="
-            # 测试 Claude CLI 是否能正常启动
-            echo "test prompt" | claude --help || echo "Claude help failed"
+        #     echo "=== Test Claude CLI directly ==="
+        #     # 测试 Claude CLI 是否能正常启动
+        #     echo "test prompt" | claude --help || echo "Claude help failed"
       
-            echo "=== Prompt file check ==="
-            ls -la ${{ runner.temp }}/claude-prompts/
-            head -10 ${{ runner.temp }}/claude-prompts/claude-prompt.txt
-          env:
-            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-            CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        #     echo "=== Prompt file check ==="
+        #     ls -la ${{ runner.temp }}/claude-prompts/
+        #     head -10 ${{ runner.temp }}/claude-prompts/claude-prompt.txt
+        #   env:
+        #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        #     CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
-        #  1. 测试网络连接和端点
-        - name: Test Custom Endpoint
-          if: always()
-          run: |
-            echo "=== Testing network connectivity ==="
-            curl -I ${{ secrets.ANTHROPIC_BASE_URL }} || echo "Cannot reach endpoint"
+        # #  1. 测试网络连接和端点
+        # - name: Test Custom Endpoint
+        #   if: always()
+        #   run: |
+        #     echo "=== Testing network connectivity ==="
+        #     curl -I ${{ secrets.ANTHROPIC_BASE_URL }} || echo "Cannot reach endpoint"
       
-            echo "=== Testing authentication ==="
-            curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
-                 -H "Content-Type: application/json" \
-                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Auth test failed"
-          env:
-            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        #     echo "=== Testing authentication ==="
+        #     curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+        #          -H "Content-Type: application/json" \
+        #          ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Auth test failed"
+        #   env:
+        #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
-        # 3. 测试直接 Claude CLI 调用
-        - name: Test Claude CLI directly
-          if: always()
-          run: |
-            export ANTHROPIC_BASE_URL="https://cc.qiniu.com/api/"
-            export ANTHROPIC_AUTH_TOKEN=${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-            echo "Testing Claude CLI with actual prompt..."
-            echo "Hello, can you hear me?" | claude -p || echo "Direct Claude test failed"
-          env:
-            ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-            ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        # # 3. 测试直接 Claude CLI 调用
+        # - name: Test Claude CLI directly
+        #   if: always()
+        #   run: |
+        #     export ANTHROPIC_BASE_URL="https://cc.qiniu.com/api/"
+        #     export ANTHROPIC_AUTH_TOKEN=${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        #     echo "Testing Claude CLI with actual prompt..."
+        #     echo "Hello, can you hear me?" | claude -p || echo "Direct Claude test failed"
+        #   env:
+        #     ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        #     ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
-        # 测试不同的认证格式：
-        - name: Test Different Auth Formats
-          if: always()
-          run: |
-            echo "=== Testing Bearer token ==="
-            curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
-                 -H "Content-Type: application/json" \
-                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Bearer failed"
+        # # 测试不同的认证格式：
+        # - name: Test Different Auth Formats
+        #   if: always()
+        #   run: |
+        #     echo "=== Testing Bearer token ==="
+        #     curl -H "Authorization: Bearer ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+        #          -H "Content-Type: application/json" \
+        #          ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "Bearer failed"
       
-            echo "=== Testing API key format ==="
-            curl -H "x-api-key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
-                 -H "Content-Type: application/json" \
-                 ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "API key failed"
+        #     echo "=== Testing API key format ==="
+        #     curl -H "x-api-key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}" \
+        #          -H "Content-Type: application/json" \
+        #          ${{ secrets.ANTHROPIC_BASE_URL }}/v1/messages || echo "API key failed"
 
 
       
