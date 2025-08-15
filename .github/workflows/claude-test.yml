@@ -37,13 +37,13 @@
             # 只使用一种认证方式
             claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
             anthropic_base_url: "https://cc.qiniu.com/api/"
-            anthropic_auth_token: "cr_fbe050995f0d07b8de304c49020563ef4893a3644a174792076fb4d18d4c2dc5"
+            anthropic_auth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
             github_token: ${{ secrets.G_TOKEN }}
             model: "claude-sonnet-4-20250514"
           env:
             # 确保 ANTHROPIC_BASE_URL 传递到 action
             anthropic_base_url: "https://cc.qiniu.com/api/"
-            anthropic_auth_token: "cr_fbe050995f0d07b8de304c49020563ef4893a3644a174792076fb4d18d4c2dc5"
+            anthropic_auth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
         # # 调试步骤（可选）
         # - name: Debug Claude Code Action
